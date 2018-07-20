@@ -1,22 +1,46 @@
 <!DOCTYPE html>
 <html>
-
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>Google Maps APIs</title>
-
+	<title>Sharpell Technologies</title>
 	<link href="style.css" rel="stylesheet">
 </head>
 
-<body>
 
+
+
+
+
+
+
+	<!--sets up dropdown menu items when the page opens -->
+<body onload="populate(batteries, 'battery_dropdown'), populate_paths(batteries[0].id)">
+
+	<!--Javascript is located in the script.js file-->
+	<script src="script.js"></script>	
+	
 	<div id="map"></div>
 
-	<script src="script.js"></script>
-	<script async defer 
-					src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap"></script>
-					
-</body>
+    <!--Sets up Battery and Path dropdown menus-->
+	<div id="dropdowns">
+    
+    <select id="battery_dropdown" name="battery_dropdown" onchange="populate_paths(this.value)"></select>
+    <select id="path_dropdown" name="path_dropdown" onchange="change_path_map(this.value)"></select>
+    </div>
 
+
+	<!--Creates buttons to switch between locations of a batteries and paths of a single battery.
+		These buttons are temporary and will be replaced with more complex buttons, dropdown menus, etc. -->
+    <div id="temporary_buttons">
+        <button onclick="init_map_locations()">Show Current Location</button>
+    </div>
+    
+
+    <!--Initiates map, insert Sharpell Tech's API key        
+        Using the following calls a function when the page opens: &callback=init_map_locations-->
+	<script async defer src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY"></script>
+
+	<div id="map-canvas"></div>
+</body>
 </html>
