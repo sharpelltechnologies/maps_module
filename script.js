@@ -1,15 +1,16 @@
 // Global Variables: may not be global once we switch to the database
-path0 = {id: 'path0', path: [{lat: 35.243580, lng: -120.644466}]};
-path1 = {id: 'path1', path:[{lat: 35.243580, lng: -120.644466},{lat: 35.267042, lng: -120.659329},{lat: 35.271198, lng: -120.665946}]};
-path2 = {id: 'path2', path:[{lat: 35.269890, lng: -120.670245}, {lat: 35.269846, lng: -120.670038}, {lat: 35.269526, lng: -120.670054}, {lat: 35.269474, lng: -120.657663}, {lat: 35.269474, lng: -120.657663},{lat: 35.269719, lng: -120.656516}, {lat: 35.274293, lng: -120.660349}]};
-path3 = {id: 'path3', path:[{lat: 35.295534, lng: 50.666385},{lat: 35.267005, lng: -120.659328},{lat: 35.280318, lng: -120.662419}]};
-path4 = {id: 'path4', path:[{lat: 37.772, lng: -122.214},{lat: 21.291, lng: -157.821},{lat: -18.142, lng: 178.431},{lat: -27.467, lng: 153.027}]};
+path0 = {id: 'path0', path: [{lat: 35.243580, lng: -120.644466, altitude: 16}]};
+path1 = {id: 'path1', path:[{lat: 35.243580, lng: -120.644466, altitude: 0},{lat: 35.267042, lng: -120.659329, altitude: 100},{lat: 35.271198, lng: -120.665946, altitude: 300}]};
+path2 = {id: 'path2', path:[{lat: 35.269890, lng: -120.670245, altitude: 10}, {lat: 35.269846, lng: -120.670038, altitude: 20}, {lat: 35.269526, lng: -120.670054, altitude: 10}, {lat: 35.269474, lng: -120.657663, altitude: 30}, {lat: 35.269719, lng: -120.656516, altitude: 45}, {lat: 35.274293, lng: -120.660349, altitude: 0}]};
+path3 = {id: 'path3', path:[{lat: 35.295534, lng: 50.666385, altitude: 0},{lat: 35.267005, lng: -120.659328, altitude: 0},{lat: 35.280318, lng: -120.662419, altitude: 0}]};
+path4 = {id: 'path4', path:[{lat: 37.772, lng: -122.214, altitude: 10},{lat: 21.291, lng: -157.821, altitude: 30},{lat: -18.142, lng: 178.431, altitude: 20},{lat: -27.467, lng: 153.027, altitude: 20}]};
 paths = [path0, path1, path2, path3, path4];
 paths1 = [path3, path4];
+paths2 = [path4];
 
 battery0 = {id: 'battery0', paths: paths};
 battery1 = {id: 'battery1', paths: paths1};
-battery2 = {id: 'battery2', paths: paths1};
+battery2 = {id: 'battery2', paths: paths2};
 batteries = [battery0, battery1, battery2];
 
 
@@ -36,6 +37,7 @@ function init_map_locations() {
     generate_location_map(center, locations);
 }
 
+
 // Initiates the map, centered around the path of a single battery, zoomed to fit the path
 function init_map_path(path) {
     if(path.length > 0){
@@ -44,10 +46,10 @@ function init_map_path(path) {
     }
     else{
         var center = [0.00000, 0.00000];
-    }
-    console.log('path: ' + path);
+	}
     generate_path_map(center, path);
 }
+
 
 // Generates a map with the locations of each battery
 // Need to fix single point and no point zoom (decide what to do when no batteries are given)
@@ -89,10 +91,10 @@ function generate_location_map(center, locations){
     }
 }
 
+
 // Generates a map with a path traveled by a battery
 // Need to fix no point zoom (decide what to do when no batteries are given)
 function generate_path_map(center, path){
-
     // Generates the map
     var map = new google.maps.Map(document.getElementById('map'), {
 		zoom: 13,
@@ -135,7 +137,7 @@ function generate_path_map(center, path){
 			map.fitBounds(bounds);
 		}
 	}
-
+	//paths.forEach(function(path){
     var path_characteristics = new google.maps.Polyline({
         path: path,
         geodesic: true,
@@ -144,7 +146,7 @@ function generate_path_map(center, path){
         strokeWeight: 2
       });
       path_characteristics.setMap(map);
-
+	//});
 }
 
 
@@ -183,40 +185,24 @@ function get_corners(locations){
 	return [top_left, bottom_right];
 }
 
+
 // Center point where map generates, center of all points
 function get_center(top_left, bottom_right){
 	center = [(top_left[0] + bottom_right[0])/2, (top_left[1] + bottom_right[1])/2];
 	return center;
 }
 
-// Distance formula for 2 points on Earth
-function get_distance (point_A, point_B){
-	var lat1 = point_A[0];
-	var lat2 = point_B[0];
-	var lon1 = point_A[1];
-	var lon2 = point_B[1];
-	var R = 6371e3; // metres
-	var φ1 = lat1 * Math.PI / 180;
-	var φ2 = lat2* Math.PI / 180;
-	var Δφ = (lat2-lat1)* Math.PI / 180;
-	var Δλ = (lon2-lon1)* Math.PI / 180;
-	var a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
-			Math.cos(φ1) * Math.cos(φ2) *
-			Math.sin(Δλ/2) * Math.sin(Δλ/2);
-	var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-	var distance = R * c;
-	return distance;
-}
 
 // Will eventually retrieve location_data from database
 function get_location_data(){
     var location_data = [];
     //location_data.push({lat: 35.243580, lng: -120.644466, id: 'Test'});
     //location_data.push({lat: 35.243580, lng: -120.644466, id: 'Test'},{lat: 35.267042, lng: -120.659329, id: 'Ross'},{lat: 35.271198, lng: -120.665946, id: 'other'});
-	//location_data.push({lat: 35.295534, lng: 50.666385, id: '0'},{lat: 35.267005, lng: -120.659328, id: 'id'},{lat: 35.280318, lng: -120.662419, id: 'Apples'});
-    location_data.push({lat: 37.772, lng: -122.214, id: 1},{lat: 21.291, lng: -157.821, id: 2},{lat: -18.142, lng: 178.431, id: 3},{lat: -27.467, lng: 153.027, id: 4});
+	location_data.push({lat: 35.295534, lng: 50.666385, id: '0'},{lat: 35.267005, lng: -120.659328, id: 'id'},{lat: 35.280318, lng: -120.662419, id: 'Apples'});
+    //location_data.push({lat: 37.772, lng: -122.214, id: 1},{lat: 21.291, lng: -157.821, id: 2},{lat: -18.142, lng: 178.431, id: 3},{lat: -27.467, lng: 153.027, id: 4});
     return location_data;
 }
+
 
 // Will eventually retrieve path_data form the database
 function get_path_data(){
@@ -228,6 +214,7 @@ function get_path_data(){
     //path_data.push({lat: 37.772, lng: -122.214},{lat: 21.291, lng: -157.821},{lat: -18.142, lng: 178.431},{lat: -27.467, lng: 153.027});
     return path_data;
 }
+
 
 // Makes a list of locations (may be replaced by the database)
 // Fomatted: [[info, latitude, longitude],...]  
@@ -258,60 +245,174 @@ function get_locations(location_data){
 
 // Changes which path is present on the map depending on what 
 // the user has selected
-function change_path_map(path_id){
-    batteries.forEach(function(battery){
-        battery.paths.forEach(function(path){
-            if (path.id == path_id){
-                init_map_path(path.path);
-            }
-        });
-    });
+function change_path_map(selection){
+	//if (selection == "show_all_paths"){
+	//	console.log('show all paths');
+	//}
+	//else{
+		batteries.forEach(function(battery){
+        	battery.paths.forEach(function(path){
+        	    if (selection == path.id){
+					init_map_path(path.path);
+					display_distance(path);
+					get_altitude(path);
+				}
+        	});
+		});
+	//}
 }
+
 
 // Populates path dropdown menu with relevant paths depending on which
 // battery is selected. Map is regenerated for first path on the list
 function populate_paths(battery_id){
-    batteries.forEach(function(battery){
-        if (battery.id == battery_id){
-            populate(battery.paths, 'path_dropdown');
-            init_map_path(battery.paths[0].path);
-        }
-    });
+	if(battery_id == "show_all_batteries"){
+		init_map_locations();
+		populate("", 'path_dropdown');
+		clear_div('altitude_graph');
+		clear_div('distance_display');
+	}
+	else{	
+			batteries.forEach(function(battery){
+			if (battery.id == battery_id){
+				populate(battery.paths, 'path_dropdown');
+				// CONTROLS INIT MAP PATH ON OPEN----COULD BE USED WHEN OPENING TO SHOW ALL PATHS
+				init_map_path(battery.paths[0].path);
+				display_distance(battery.paths[0]);
+				get_altitude(battery.paths[0]);
+			}
+	});
+		
+	}
 }
 
+
 // Populates the battery list, this is run once when the page loads.
-function populate(batteries, select_id){
+function populate(list_items, select_id){
 	var select = document.getElementById(select_id);
-    select.innerHTML = "";
-    for(battery in batteries){
-        var newOption = document.createElement("option");
-		newOption.value = batteries[battery].id;
-		newOption.innerHTML = batteries[battery].id;
+	select.innerHTML = "";
+	var newOption;
+ 
+	if (list_items.length > 0 && select_id == 'battery_dropdown'){
+		newOption = document.createElement("option");
+		newOption.value = 'show_all_batteries';
+		newOption.innerHTML = "Show All Batteries";
+		select.options.add(newOption);
+	}
+
+    for(item in list_items){
+        newOption = document.createElement("option");
+		newOption.value = list_items[item].id;
+		newOption.innerHTML = list_items[item].id;
 		select.options.add(newOption);
     }
 }
 
-/*
-// Creates a new select tag and populates it with an array
-function do_something(battery){
-    var myDiv = document.getElementById("dropdowns");
 
-//Create array of options to be added
-var array = ['ROSS', 'SURE', 'SLEEP', 'WOAH'];
 
-//Create and append select list
-var selectList = document.createElement("select");
-selectList.id = "mySelect";
-selectList.onchange = "console.log('PLEASE JESUS')"
-myDiv.appendChild(selectList);
-console.log(selectList);
-//Create and append the options
-for (var i = 0; i < array.length; i++) {
-    var option = document.createElement("option");
-    option.value = array[i];
-    option.text = array[i];
-    selectList.appendChild(option);
+
+
+
+///////////////////////////////////////////////////////////////////////////////////
+//                                 Stats Display                                 //
+///////////////////////////////////////////////////////////////////////////////////
+
+
+// Distance formula for 2 points on Earth
+function get_distance (point_A, point_B){
+	var lat1 = point_A.lat;
+	var lat2 = point_B.lat;   
+	var lon1 = point_A.lng;
+	var lon2 = point_B.lng;
+	var R = 6371e3; // metres
+	var φ1 = lat1 * Math.PI / 180;
+	var φ2 = lat2* Math.PI / 180;
+	var Δφ = (lat2-lat1)* Math.PI / 180;
+	var Δλ = (lon2-lon1)* Math.PI / 180;
+	var a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
+			Math.cos(φ1) * Math.cos(φ2) *
+			Math.sin(Δλ/2) * Math.sin(Δλ/2);
+	var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+	var distance = R * c;
+	return distance;
 }
-console.log(battery_dropdown);
+
+
+// Returns the distance traveled along a path
+function find_path_length(path){
+	var total_distance = 0;
+	var segment_distance;
+	var point;
+	for (point=0; point < path.length - 1; point++){
+		segment_distance = get_distance (path[point], path[point + 1]);
+		total_distance += segment_distance;
+	}
+	return total_distance;
 }
-*/
+
+
+// Displays the distance of a given path in meters to two decimals
+function display_distance(path){
+	if (path.path.length > 1){
+	var display = document.getElementById('distance_display');
+		distance = find_path_length(path.path).toFixed(2);
+		display.innerHTML = path.id + ': ' + distance + ' meters';
+	}
+	else{
+		clear_div('distance_display');
+	}
+}
+
+
+// Uses traces and a layout to form an altitude graph. By adding a loop and appending to the 
+// data list, we can make multiple paths appear on the altitude graph. We should do this once
+// We figure out how to add multiple paths to the map
+function get_altitude(path){
+	if(path.path.length>1){
+		var trace1;
+		trace1 = get_altitude_data(path);
+		var data = [trace1];
+		var layout = {
+			title: 'Altitude Graph',
+			xaxis: {
+				title: 'Distance (meters)',
+				zeroline: true
+			},
+			yaxis: {
+				title: 'Altitude (meters)',
+				zeroline: true
+			}
+		};
+		Plotly.newPlot('altitude_graph', data, layout);
+	}
+	else{
+		clear_div('altitude_graph');
+	}
+}
+	
+
+// Returns trace value describing a set of points. It is used in creating the altitude graph
+function get_altitude_data(path){
+	var i;
+	var x_value = 0;
+	var trace = {
+		x: [0],
+		y: [],
+		mode: 'lines',
+		name: path.id
+	};
+	
+	for (i = 0; i < path.path.length - 1; i++){
+		trace.y.push(path.path[i].altitude);
+		x_value +=  get_distance(path.path[i], path.path[i + 1]) ;
+		trace.x.push(x_value);
+	}
+	trace.y.push(path.path[i].altitude);
+	return trace;
+}
+
+
+// Clears all tags from a specified div tag. Used to clear stats and altitude graph
+function clear_div(elementId){
+	document.getElementById(elementId).innerHTML = "";
+}

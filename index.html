@@ -5,42 +5,34 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>Sharpell Technologies</title>
 	<link href="style.css" rel="stylesheet">
+	<script src="https://cdn.plot.ly/plotly-latest.min.js">// Graph generated using plotly.js</script>
+	<script src="script.js">//Javascript located in script.js file</script>
+	<!--Insert Sharpell Tech's API key-->
+	<script async defer src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY"></script>
 </head>
 
 
 
-
-
-
-
-
 	<!--sets up dropdown menu items when the page opens -->
-<body onload="populate(batteries, 'battery_dropdown'), populate_paths(batteries[0].id)">
-
-	<!--Javascript is located in the script.js file-->
-	<script src="script.js"></script>	
+<body onload="populate(batteries, 'battery_dropdown'), init_map_locations()">
 	
-	<div id="map"></div>
+	
+	<!---------------- Map Set Up ---------------->
+	<div id="map"><!-- Map is generated in this tag --></div>
 
-    <!--Sets up Battery and Path dropdown menus-->
+
+    <!-------------- Dropdown Menus -------------->
 	<div id="dropdowns">
-    
-    <select id="battery_dropdown" name="battery_dropdown" onchange="populate_paths(this.value)"></select>
-    <select id="path_dropdown" name="path_dropdown" onchange="change_path_map(this.value)"></select>
+    	<select id="battery_dropdown" name="battery_dropdown" onchange="populate_paths(this.value)"></select>
+    	<select id="path_dropdown" name="path_dropdown" onchange="change_path_map(this.value)" ></select>
     </div>
+	
 
+	<!---------- Altitude and Distance ------------>
+	<div id="stats">
+		<div id="altitude_graph"><!-- Plotly chart will be drawn inside this DIV --></div>
+		<div id="distance_display"><!-- Distance will be displayed here --></div>
+	</div>
 
-	<!--Creates buttons to switch between locations of a batteries and paths of a single battery.
-		These buttons are temporary and will be replaced with more complex buttons, dropdown menus, etc. -->
-    <div id="temporary_buttons">
-        <button onclick="init_map_locations()">Show Current Location</button>
-    </div>
-    
-
-    <!--Initiates map, insert Sharpell Tech's API key        
-        Using the following calls a function when the page opens: &callback=init_map_locations-->
-	<script async defer src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY"></script>
-
-	<div id="map-canvas"></div>
 </body>
 </html>
