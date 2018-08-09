@@ -1,4 +1,4 @@
-// Global Variables: may not be global once we switch to the database
+// Temporary Data points: the end product will not have this--it is purley for test points
 path0 = {id: 'path0', path: [{lat: 35.243580, lng: -120.644466, altitude: 16}]};
 path1 = {id: 'path1', path:[{lat: 35.243580, lng: -120.644466, altitude: 0},{lat: 35.267042, lng: -120.659329, altitude: 100},{lat: 35.271198, lng: -120.665946, altitude: 300}]};
 path2 = {id: 'path2', path:[{lat: 35.269890, lng: -120.670245, altitude: 10}, {lat: 35.269846, lng: -120.670038, altitude: 20}, {lat: 35.269526, lng: -120.670054, altitude: 10}, {lat: 35.269474, lng: -120.657663, altitude: 30}, {lat: 35.269719, lng: -120.656516, altitude: 45}, {lat: 35.274293, lng: -120.660349, altitude: 0}]};
@@ -24,49 +24,47 @@ batteries = [battery0, battery1, battery2];
 
 
 // Initiates the map, centered between the batteries' locations and zoomed to fit all markers
-function init_map_locations() {
-    var location_data = get_location_data();
-    var locations = get_locations(location_data);
+function init_map_locations(batteries) {
+	var locations = get_locations(batteries);
     if(locations.length > 0){
         var corner_points = get_corners(locations);
         var center = get_center(corner_points[0], corner_points[1]);
     }
     else{
-        var center = [0.00000, 0.00000];
+		var center = [0.00000, 0.00000];
 	}
-    generate_location_map(center, locations);
-}
-
-
-// Initiates the map, centered around the path of a single battery, zoomed to fit the path
-function init_map_path(path) {
-    if(path.length > 0){
-        var corner_points = get_corners(path);
-        var center = get_center(corner_points[0], corner_points[1]);
-    }
-    else{
-        var center = [0.00000, 0.00000];
-	}
-    generate_path_map(center, path);
+    generate_location_map(center, locations, batteries);
 }
 
 
 // Generates a map with the locations of each battery
-// Need to fix single point and no point zoom (decide what to do when no batteries are given)
-function generate_location_map(center, locations){
-
+function generate_location_map(center, locations, batteries){
+	if (locations.length > 1) {
+		map_id = 'all';
+	}
+	else{
+		map_id = batteries[0].id;
+	}
     // Generates the map
-    var map = new google.maps.Map(document.getElementById('map'), {
+    var map = new google.maps.Map(document.getElementById('map_' + map_id), {
 		zoom: 13,
 		center: new google.maps.LatLng(center[0], center[1]),
 		mapTypeId: google.maps.MapTypeId.ROADMAP
-    });	
+	});	
     
+	var bounds = get_markers(map, locations, batteries);
+	// Now fit the map to the newly inclusive bounds
+	if (locations.length > 1){
+		map.fitBounds(bounds);
+    }
+}
 
-    // Adds a marker at each specified location
-    var marker, i;
+
+// Adds a marker at each specified location (used for location maps, can alter to work for paths)
+function get_markers(map, locations){
+	var marker, i, infowindow;
 	var bounds = new google.maps.LatLngBounds();
-    var infowindow = new google.maps.InfoWindow({});
+
     for (i = 0; i < locations.length; i++) {
 		marker = new google.maps.Marker({
 			position: new google.maps.LatLng(locations[i].lat, locations[i].lng),
@@ -75,7 +73,7 @@ function generate_location_map(center, locations){
 
 		// Extend the bounds to include each marker's position
 		bounds.extend(marker.position);
-
+		
 		// Clicking the red location tag will bring up the information tag
 		infowindow = new google.maps.InfoWindow({});
 		google.maps.event.addListener(marker, 'click', (function (marker, i) {
@@ -85,25 +83,52 @@ function generate_location_map(center, locations){
 			}
 		})(marker, i));
 	}
-	// Now fit the map to the newly inclusive bounds
-	if (locations.length > 1){
-		map.fitBounds(bounds);
+	return bounds;
+}
+
+
+// Creates a map for each collapsible menu
+function show_mini_maps(batteries){
+	batteries.forEach(function (battery){
+		init_map_locations([battery]);
+	});
+}
+
+
+// Initiates the map, centered around the path of a single battery, zoomed to fit the path
+function init_map_path(path, battery) {
+    if(path.length > 0){
+        var corner_points = get_corners(path);
+        var center = get_center(corner_points[0], corner_points[1]);
     }
+    else{
+        var center = [0.00000, 0.00000];
+	}
+    generate_path_map(center, path, battery);
 }
 
 
 // Generates a map with a path traveled by a battery
 // Need to fix no point zoom (decide what to do when no batteries are given)
-function generate_path_map(center, path){
-    // Generates the map
-    var map = new google.maps.Map(document.getElementById('map'), {
+function generate_path_map(center, path, battery){
+	// Generates the map
+	if (battery){
+		id = battery.id;
+	}
+	else{
+		id = 'all';
+	}
+	console.log(id);
+	
+	var map = new google.maps.Map(document.getElementById('map_' + id), {
 		zoom: 13,
 		center: new google.maps.LatLng(center[0], center[1]),
 		mapTypeId: google.maps.MapTypeId.ROADMAP
     });	
     
-    // Adds a marker at end points, create a path between each data point
-    if(path.length > 0){
+	// Adds a marker at end points, create a path between each data point
+	
+    if(path.length > 0 && id != 'all'){
 		var marker, i;
 		var bounds = new google.maps.LatLngBounds();
 		var infowindow = new google.maps.InfoWindow({});
@@ -140,7 +165,7 @@ function generate_path_map(center, path){
 	//paths.forEach(function(path){
     var path_characteristics = new google.maps.Polyline({
         path: path,
-        geodesic: true,
+        geodesic: false,
         strokeColor: '#FF0000',
         strokeOpacity: 1.0,
         strokeWeight: 2
@@ -193,44 +218,27 @@ function get_center(top_left, bottom_right){
 }
 
 
-// Will eventually retrieve location_data from database
-function get_location_data(){
-    var location_data = [];
-    //location_data.push({lat: 35.243580, lng: -120.644466, id: 'Test'});
-    //location_data.push({lat: 35.243580, lng: -120.644466, id: 'Test'},{lat: 35.267042, lng: -120.659329, id: 'Ross'},{lat: 35.271198, lng: -120.665946, id: 'other'});
-	location_data.push({lat: 35.295534, lng: 50.666385, id: '0'},{lat: 35.267005, lng: -120.659328, id: 'id'},{lat: 35.280318, lng: -120.662419, id: 'Apples'});
-    //location_data.push({lat: 37.772, lng: -122.214, id: 1},{lat: 21.291, lng: -157.821, id: 2},{lat: -18.142, lng: 178.431, id: 3},{lat: -27.467, lng: 153.027, id: 4});
-    return location_data;
-}
-
-
-// Will eventually retrieve path_data form the database
-function get_path_data(){
-	var path_data = [];
-	//path_data.push({lat: 35.243580, lng: -120.644466});
-	//path_data.push({lat: 35.243580, lng: -120.644466},{lat: 35.267042, lng: -120.659329},{lat: 35.271198, lng: -120.665946});
-	path_data.push({lat: 35.269890, lng: -120.670245}, {lat: 35.269846, lng: -120.670038}, {lat: 35.269526, lng: -120.670054}, {lat: 35.269474, lng: -120.657663}, {lat: 35.269474, lng: -120.657663},{lat: 35.269719, lng: -120.656516}, {lat: 35.274293, lng: -120.660349});
-	//path_data.push({lat: 35.295534, lng: 50.666385},{lat: 35.267005, lng: -120.659328},{lat: 35.280318, lng: -120.662419});
-    //path_data.push({lat: 37.772, lng: -122.214},{lat: 21.291, lng: -157.821},{lat: -18.142, lng: 178.431},{lat: -27.467, lng: 153.027});
-    return path_data;
-}
-
-
-// Makes a list of locations (may be replaced by the database)
+// Makes a list of locations 
 // Fomatted: [[info, latitude, longitude],...]  
-function get_locations(location_data){
-    var locations = [];
-	location_data.forEach(function(battery){
-		var location = {
+function get_locations(batteries){
+	var locations = [];
+	var location;
+
+	batteries.forEach(function(battery){
+		index = battery.paths[0].path.length - 1;
+		point = battery.paths[0].path[index];
+		
+		location ={
 		id: 'Battery ID: ' + battery.id + '<br>\
 		<a href="https://www.google.com/maps/dir/?api=1&destination=\
-		'+ String(battery.lat) + ',' + String(battery.lng) +'">Get Directions</a>',
-		lat: battery.lat,
-		lng: battery.lng
+		'+ String(point.lat) + ',' + String(point.lng) +'">Get Directions</a>',
+		lat: point.lat,
+		lng: point.lng
         }
 		locations.push(location);
-    });
-    return locations;
+		
+	});
+	return locations;	
 }
 
 
@@ -245,20 +253,21 @@ function get_locations(location_data){
 
 // Changes which path is present on the map depending on what 
 // the user has selected
-function change_path_map(selection){
+function change_path_map(selection, battery){
 	//if (selection == "show_all_paths"){
 	//	console.log('show all paths');
 	//}
 	//else{
-		batteries.forEach(function(battery){
+		//batteries.forEach(function(battery){
+			console.log(selection);
         	battery.paths.forEach(function(path){
         	    if (selection == path.id){
-					init_map_path(path.path);
-					display_distance(path);
-					get_altitude(path);
+					init_map_path(path.path, battery);
+					display_distance(path, battery);
+					get_altitude(path, battery);
 				}
         	});
-		});
+		//});
 	//}
 }
 
@@ -266,25 +275,23 @@ function change_path_map(selection){
 // Populates path dropdown menu with relevant paths depending on which
 // battery is selected. Map is regenerated for first path on the list
 function populate_paths(battery_id){
-	if(battery_id == "show_all_batteries"){
+/*	if(battery_id == "show_all_batteries"){
 		init_map_locations();
 		populate("", 'path_dropdown');
 		clear_div('altitude_graph');
 		clear_div('distance_display');
 	}
-	else{	
+	else{	*/
 			batteries.forEach(function(battery){
 			if (battery.id == battery_id){
-				populate(battery.paths, 'path_dropdown');
-				// CONTROLS INIT MAP PATH ON OPEN----COULD BE USED WHEN OPENING TO SHOW ALL PATHS
+				populate(battery.paths, 'path_dropdown_' + battery.id);
 				init_map_path(battery.paths[0].path);
 				display_distance(battery.paths[0]);
 				get_altitude(battery.paths[0]);
 			}
-	});
-		
+		});
 	}
-}
+//}
 
 
 // Populates the battery list, this is run once when the page loads.
@@ -292,13 +299,13 @@ function populate(list_items, select_id){
 	var select = document.getElementById(select_id);
 	select.innerHTML = "";
 	var newOption;
- 
-	if (list_items.length > 0 && select_id == 'battery_dropdown'){
+	
+	/*if (list_items.length > 0 && select_id == 'battery_dropdown'){
 		newOption = document.createElement("option");
 		newOption.value = 'show_all_batteries';
 		newOption.innerHTML = "Show All Batteries";
 		select.options.add(newOption);
-	}
+	} */
 
     for(item in list_items){
         newOption = document.createElement("option");
@@ -416,3 +423,85 @@ function get_altitude_data(path){
 function clear_div(elementId){
 	document.getElementById(elementId).innerHTML = "";
 }
+
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////////
+//                                Collapsible Menu                                //
+////////////////////////////////////////////////////////////////////////////////////
+
+
+// Makes the Collapse menu click sensitive and controls the toggle
+function toggle_collapse_menu(){
+	var coll = document.getElementsByClassName("collapsible");
+	var i;
+	for (i = 0; i < coll.length; i++) {
+		coll[i].addEventListener("click", function() {
+			this.classList.toggle("active");
+			var content = this.nextElementSibling;
+			if (content.style.maxHeight){
+				content.style.maxHeight = null;
+				console.log('Close Collapse Menu')
+			} 
+			else {
+				content.style.maxHeight = content.scrollHeight + "px";
+				console.log('Open Collapse Menu');
+			} 
+		});
+	}
+}
+
+
+/* A collapse menu is created for each of the batteries, the collapse menu is of this html format:
+  <button class="collapsible">Collapse</button>
+		 <div class="content" id="content">-->
+		 	<div id="map_battery0">...</div>
+			<div id="dropdowns">...</div>
+			<div id="stats">...</div>
+    	 </div> */
+
+function create_collapse_menus(batteries){
+	var select = document.getElementById('collapse_menus');
+	var button;
+	batteries.forEach(function(battery){
+
+		button = "<button class='collapsible' id='collapsible' value =" + battery.id + "> " + battery.id + " </button>";
+		content = 
+		"<div class='content' name=" + battery.id + ">" +
+			"<div id='map_" + battery.id + "' class='map'></div>" +
+			
+			"<div id='dropdowns'>" +
+				"<select id='path_dropdown_" + battery.id + "' onload='populate_paths(" + battery.id + ")' onchange='change_path_map(this.value, " + battery.id +")'></select>" +
+			"</div>" +
+
+			"<div id='stats'>" +
+				"<div id='altitude_graph_" + battery.id + " '><!-- Plotly chart --></div>" +
+				// Distance will be displayed here
+				"<div id='distance_display_" + battery.id + "'></div>" +
+			"</div>" +
+		"</div>";
+
+		select.innerHTML += button;
+		select.innerHTML += content;
+
+		populate_paths(battery.id);
+	});
+	console.log(select);
+toggle_collapse_menu();
+}
+
+
+
+
+
+
+
+
+/*
+Where I left off:   Want to add dropdown for paths to each collapsible menu
+May need to fix show all batteries. Will we use this?
+Want to add some form of padding to the content div or the map div to give it space.
+*/
