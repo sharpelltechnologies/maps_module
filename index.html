@@ -6,33 +6,29 @@
 	<title>Sharpell Technologies</title>
 	<link href="style.css" rel="stylesheet">
 	<script src="https://cdn.plot.ly/plotly-latest.min.js">// Graph generated using plotly.js</script>
-	<script src="script.js">//Javascript located in script.js file</script>
+	
+	<script src="collapse.js"></script>
+	<script src="initiate_map.js"></script>
+	<script src="dropdown.js"></script>
+	<script src="stats.js"></script>
+	
 	<!--Insert Sharpell Tech's API key-->
 	<script async defer src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY"></script>
 </head>
 
 
-
-	<!--sets up dropdown menu items when the page opens -->
-<body onload="populate(batteries, 'battery_dropdown'), init_map_locations()">
+	<!--sets up maps, collapse menus and corresponding information
+		when the page opens -->
+<body onload=
+"create_collapse_menus(batteries), 
+init_map_locations(batteries), 
+show_mini_maps(batteries),
+checkEdits(batteries)">
 	
 	
-	<!---------------- Map Set Up ---------------->
-	<div id="map"><!-- Map is generated in this tag --></div>
-
-
-    <!-------------- Dropdown Menus -------------->
-	<div id="dropdowns">
-    	<select id="battery_dropdown" name="battery_dropdown" onchange="populate_paths(this.value)"></select>
-    	<select id="path_dropdown" name="path_dropdown" onchange="change_path_map(this.value)" ></select>
-    </div>
+	<div id="map_all" class="map"><!-- Map is generated in this tag --></div>
+	<div class = "collapse_menus" id = "collapse_menus"></div>
 	
-
-	<!---------- Altitude and Distance ------------>
-	<div id="stats">
-		<div id="altitude_graph"><!-- Plotly chart will be drawn inside this DIV --></div>
-		<div id="distance_display"><!-- Distance will be displayed here --></div>
-	</div>
 
 </body>
 </html>
