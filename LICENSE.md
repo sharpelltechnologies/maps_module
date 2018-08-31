@@ -1,12 +1,14 @@
 Copyright (c) 2018 Sharpell Technology
 
-The following MIT License is for Tania Rascia and Plotly, Inc:
+The following MIT License is for Tania Rascia, Plotly, Inc., and Facebook, Inc.:
 
 MIT License
 
 Copyright (c) 2017 Tania Rascia
 
-Copyright (c) 2018 Plotly, Inc
+Copyright (c) 2018 Plotly, Inc.
+
+Copywrite (c) 2013-present Facebook, Inc.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

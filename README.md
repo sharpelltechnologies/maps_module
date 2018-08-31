@@ -29,3 +29,4 @@ The code is open source and available under the [MIT License](LICENSE.md).
 * Ross Dalke
 * Tania Rascia: Map initialization, multiple tag placements, tag information/directions
 * Plotly, Inc: Graphing capabilities
+* Facebook Inc: React capabilities

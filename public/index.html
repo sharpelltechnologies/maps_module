@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Sharpell Technologies</title>
+	<!-- <link href="../src/style.css" rel="stylesheet"> -->
+	    <!--
+      manifest.json provides metadata used when your web app is added to the
+      homescreen on Android. See https://developers.google.com/web/fundamentals/engage-and-retain/web-app-manifest/
+    -->
+    
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json">
+    <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico">
+    <!--
+      Notice the use of %PUBLIC_URL% in the tags above.
+      It will be replaced with the URL of the `public` folder during the build.
+	  ONLY FILES INSIDE THE `public` FOLDER CAN BE REFERENCED FROM THE HTML.
+
+      Unlike "/favicon.ico" or "favicon.ico", "%PUBLIC_URL%/favicon.ico" will
+      work correctly both with client-side routing and a non-root public URL.
+      Learn how to configure a non-root public URL by running `npm run build`.
+    -->
+	<script src="https://cdn.plot.ly/plotly-latest.min.js">// Graph generated using plotly.js</script>
+
+	
+	<!--Insert Sharpell Tech's API key-->
+	<script async defer src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY"></script>
+</head>
+
+
+	<!--sets up maps, collapse menus and corresponding information
+		when the page opens -->
+<body>
+	 <!-- onload=
+"create_collapse_menus(batteries), 
+init_map_locations(batteries), 
+show_mini_maps(batteries),
+checkEdits(batteries)" -->
+	
+	<div id="map_all" class="map"><!-- Map is generated in this tag --></div>
+	<div class = "collapse_menus" id = "collapse_menus"></div>
+	
+	<div id='root'></div>
+
+</body>
+</html>
+
+
+<!--Where I left off:
+		Trying to import multiple javascript files.
+		-->

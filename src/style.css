@@ -1,0 +1,89 @@
+.body {min-width:80em;}
+
+.map {
+	height: 16em;
+    width: 16em;
+    /* display: inline-block; */
+}
+/* 
+.dropdowns{
+    display:inline-block;
+} */
+
+.info_block {
+    margin-right: auto;    
+    margin-left: 0em;    
+    width: 70%;    
+    max-width: 100%;    
+    min-width: 50em;
+    
+}
+
+p{
+    margin:0em;
+}
+
+
+
+/*            Show Stats Collapsible Menu             */
+
+
+ /* .collapse_menus{
+    position: fixed;
+}  */
+
+/* .stats{
+    width: 100%;
+    display: inline-block;
+} */
+
+/* 
+.distance_display{
+    display: inline-block;
+}
+
+
+.altitude_graph{
+    display: inline-block;
+}
+
+
+.battery_graph{
+    display: inline-block;
+    
+} */
+
+
+.info_bar{
+    background-color: #383838;
+    color: white;
+    /* padding: 1.25em; */
+    height:1.25em;
+    width: 7.5em;
+    border: none;
+    text-align: left;
+    outline: none;
+    font-size: 1em; 
+    display: inline-block;
+    /* margin: 0em; */
+}
+
+
+.collapsible {
+    cursor: pointer;
+}
+
+
+.active, .collapsible:hover {
+	background-color: #999999;
+}
+
+
+.content {
+    padding: 0em .9em;
+    max-height: 0;
+    width: 100%;
+    overflow: hidden;
+    transition: max-height 0.4s ease-out;
+    background-color: #f2f2f2;
+}
